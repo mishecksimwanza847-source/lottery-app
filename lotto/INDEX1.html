@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Lottery Number Generator</title>
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2196F3">
+
+  <!-- App Icon -->
+  <link rel="icon" href="icons/icon-192.png">
+
+  <style>
+    /* --- Your existing CSS --- */
+    :root {
+      --light-bg: linear-gradient(to bottom, #e0f7fa, #ffffff);
+      --light-card: #ffffff;
+      --light-text: #222;
+      --light-button: #4CAF50;
+      --light-button-hover: #45a049;
+
+      --dark-bg: linear-gradient(to bottom, #0b1d3a, #1a263d);
+      --dark-card: #1f2a3a;
+      --dark-text: #f0f0f0;
+      --dark-button: #2196F3;
+      --dark-button-hover: #1976D2;
+      --dark-ball-bg: #2a3b50;
+      --dark-input-bg: #2a3b50;
+      --dark-input-text: #ffffff;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      transition: background 0.5s, color 0.5s;
+      background: var(--light-bg);
+      color: var(--light-text);
+    }
+
+    h1 {
+      color: var(--light-text);
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .controls, .numbers, .history {
+      width: 100%;
+      max-width: 420px;
+      background: var(--light-card);
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      padding: 15px;
+      margin-bottom: 15px;
+      transition: background 0.5s, color 0.5s, box-shadow 0.5s;
+      box-sizing: border-box;
+    }
+
+    .controls label, .controls select, .controls input {
+      font-size: 16px;
+      margin: 5px 0;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .controls input, .controls select {
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    .controls .row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 10px;
+    }
+
+    button {
+      padding: 10px 14px;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      transition: background 0.3s;
+      background: var(--light-button);
+      color: white;
+      flex: 1 1 45%;
+      min-width: 120px;
+    }
+    button:hover { background: var(--light-button-hover); }
+
+    .numbers span {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      line-height: 40px;
+      border-radius: 50%;
+      background: var(--light-card);
+      text-align: center;
+      margin: 4px;
+      font-weight: bold;
+      font-size: 18px;
+      color: var(--light-text);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      transition: all 0.4s;
+    }
+
+    .history { display:none; }
+
+    /* Dark mode */
+    body.dark-mode {
+      background: var(--dark-bg);
+      color: var(--dark-text);
+    }
+    body.dark-mode h1, body.dark-mode label, body.dark-mode select, body.dark-mode input {
+      color: var(--dark-text);
+    }
+    body.dark-mode .controls, body.dark-mode .numbers, body.dark-mode .history {
+      background: var(--dark-card);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      color: var(--dark-text);
+    }
+    body.dark-mode button { background: var(--dark-button); }
+    body.dark-mode button:hover { background: var(--dark-button-hover); }
+    body.dark-mode .numbers span {
+      background: var(--dark-ball-bg);
+      color: #ffffff;
+      box-shadow: 0 0 6px rgba(77,208,225,0.6);
+    }
+    body.dark-mode .controls input, body.dark-mode .controls select {
+      background: var(--dark-input-bg);
+      color: var(--dark-input-text);
+      border: 1px solid #444;
+    }
+
+    #themeToggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 6px 10px;
+      font-size: 14px;
+    }
+
+    @media (max-width: 480px) {
+      .controls .row { flex-direction: column; }
+      button { flex: 1 1 100%; }
+    }
+  </style>
+</head>
+<body>
+  <h1>🎲 Lottery Number Generator</h1>
+  <button id="themeToggle">🌙 Dark Mode</button>
+  <div class="controls">
+    <label for="pickCount">Numbers per set (1–5)</label>
+    <select id="pickCount">
+      <option>1</option><option>2</option><option>3</option>
+      <option>4</option><option selected>5</option>
+    </select>
+    <label for="maxNumber">Max number</label>
+    <input type="number" id="maxNumber" value="50" min="5">
+    <label for="setCount">Sets</label>
+    <input type="number" id="setCount" value="1" min="1" max="50">
+    <div class="row">
+      <button id="btnGenerate">Get Numbers</button>
+      <button id="btnSave">💾 Save Numbers</button>
+      <button id="btnExport">📤 Export History</button>
+      <button id="btnHistory">Toggle History</button>
+      <button id="btnClear">🧹 Clear</button>
+      <button id="btnClearHistory">🗑️ Clear History</button>
+    </div>
+  </div>
+  <div class="numbers" id="numbers"></div>
+  <div class="history" id="historyContainer">
+    <strong>📜 History (<span id="historyCount">0</span>)</strong>
+    <div id="historyList">No history yet.</div>
+  </div>
+
+  <script>
+    let lastResults=[],historyLog=[];
+    const body=document.body;
+    const themeToggle=document.getElementById('themeToggle');
+
+    function applyTheme(theme){
+      if(theme==='dark'){
+        body.classList.add('dark-mode');
+        themeToggle.innerText='☀️ Light Mode';
+        localStorage.setItem('theme','dark');
+      } else {
+        body.classList.remove('dark-mode');
+        themeToggle.innerText='🌙 Dark Mode';
+        localStorage.setItem('theme','light');
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", ()=>{
+      // Restore theme
+      applyTheme(localStorage.getItem('theme')||'light');
+      themeToggle.addEventListener('click',()=>{
+        if(body.classList.contains('dark-mode')) applyTheme('light');
+        else applyTheme('dark');
+      });
+
+      document.getElementById('btnGenerate').addEventListener('click', generateNumbers);
+      document.getElementById('btnSave').addEventListener('click', saveLatest);
+      document.getElementById('btnExport').addEventListener('click', exportHistory);
+      document.getElementById('btnHistory').addEventListener('click', toggleHistory);
+      document.getElementById('btnClear').addEventListener('click', clearNumbers);
+      document.getElementById('btnClearHistory').addEventListener('click', clearHistory);
+    });
+
+    function generateNumbers(){
+      const count=parseInt(document.getElementById('pickCount').value,10);
+      const max=parseInt(document.getElementById('maxNumber').value,10);
+      let sets=parseInt(document.getElementById('setCount').value,10);
+      sets=Math.min(50,Math.max(1,sets));
+      let results=[];
+      let timestamp=new Date().toLocaleString();
+      for(let s=0;s<sets;s++){ 
+        let nums=[]; 
+        while(nums.length<count){ 
+          let n=Math.floor(Math.random()*max)+1; 
+          if(!nums.includes(n)) nums.push(n);
+        } 
+        nums.sort((a,b)=>a-b); 
+        results.push(nums); 
+        historyLog.push(`[${timestamp}] ${nums.join(' – ')}`);
+      }
+      lastResults=results;
+      displayNumbers(results);
+      updateHistoryDisplay();
+    }
+
+    function displayNumbers(sets){
+      const container=document.getElementById('numbers'); container.innerHTML='';
+      sets.forEach(set=>{
+        set.forEach(num=>{
+          const span=document.createElement('span'); 
+          span.innerText=num; 
+          container.appendChild(span); 
+        }); 
+        container.appendChild(document.createElement('br')); 
+      });
+    }
+
+    function saveLatest(){ 
+      if(!lastResults.length){ alert('No numbers!'); return;} 
+      let content=`Saved on ${new Date().toLocaleString()}\n`+lastResults.map(s=>s.join(' – ')).join('\n'); 
+      downloadText(content,'lottery_numbers.txt');
+    }
+
+    function exportHistory(){ 
+      if(!historyLog.length){ alert('No history!'); return;} 
+      downloadText('Lottery History\n\n'+historyLog.join('\n'),'lottery_history.txt');
+    }
+
+    function downloadText(content,filename){
+      const blob=new Blob([content],{type:'text/plain'});
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');
+      a.href=url;
+      a.download=filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function toggleHistory(){
+      const h=document.getElementById('historyContainer');
+      h.style.display=h.style.display==='none'?'block':'none';
+    }
+
+    function clearNumbers(){ 
+      lastResults=[]; 
+      document.getElementById('numbers').innerHTML='';
+    }
+
+    function clearHistory(){
+      if(confirm("Clear all history?")){
+        historyLog=[];
+        updateHistoryDisplay();
+      }
+    }
+
+    function updateHistoryDisplay(){
+      const list=document.getElementById('historyList');
+      const count=document.getElementById('historyCount');
+      if(!historyLog.length){ list.innerText='No history yet.'; count.innerText='0'; return;}
+      list.innerHTML=historyLog.map(entry=>`<div>${entry}</div>`).join('');
+      count.innerText=historyLog.length;
+    }
+
+    // Register Service Worker
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker
+          .register("sw.js")
+          .then(() => console.log("✅ Service Worker registered"))
+          .catch(err => console.log("❌ Service Worker failed:", err));
+      });
+    }
+  </script>
+</body>
+</html>

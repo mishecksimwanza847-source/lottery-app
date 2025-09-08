@@ -1,0 +1,20 @@
+Lottery Number Generator
+Copyright (c) 2025 Misheck Simwanza
+
+All rights reserved.
+
+This software is proprietary and is not free to use, copy, modify, or distribute without written permission from the copyright holder.
+
+Terms of Use:
+1. You may download and view this software for personal, non-commercial use only.
+2. To use this software in any commercial project, business, or redistribution, you must purchase a valid license from the copyright holder.
+3. Redistribution, modification, or hosting of this software without an active license agreement is strictly prohibited.
+4. Unauthorized use, copying, or distribution of this software may result in legal action.
+
+How to Obtain a License:
+To purchase a commercial license, please contact:
+Misheck Simwanza
+Email: mishecksimwanza847@gmail.com
+
+Disclaimer:
+This software is provided "as is" without warranty of any kind. The copyright holder is not responsible for any damages or losses resulting from use of this software.
